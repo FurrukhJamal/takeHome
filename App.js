@@ -3,6 +3,7 @@ import React from 'react';
 import { Button, StatusBar, Platform, StyleSheet, Text, View, FlatList, Image,  SafeAreaView, TouchableOpacity} from 'react-native';
 import * as WebBrowser from "expo-web-browser";
 
+
 const PostList = (props)=>(
   <View style = {styles.postListContainer}>
     <FlatList
@@ -10,7 +11,9 @@ const PostList = (props)=>(
       data = {props.data}
       renderItem = {(obj)=>renderPost(obj, props.openLink)}
       keyExtractor = {(item, index)=> index.toString()}
-      onEndReached = {props.onEndReached}/>
+      onEndReached = {props.onEndReached}
+      removeClippedSubviews = {true}
+      />
   </View>
 )
 
@@ -65,6 +68,7 @@ export default class App extends React.Component{
     topPosts : false,
     newPosts : false,
     api_url : "https://api.reddit.com/r/programming/hot.json",
+
   }
 
   async componentDidMount(){
@@ -103,15 +107,38 @@ export default class App extends React.Component{
       topPosts : true,
       newPosts : false,
     })
+
+
   }
 
   //to handle newest Post Selection
-  hanldeNewPostSelection = ()=> {
+  hanldeNewPostSelection = async()=> {
+    let link = "https://api.reddit.com/r/programming/new.json"
     this.setState({
       allPosts : false,
       topPosts : false,
       newPosts : true,
-      queryAfter : ""
+      queryAfter : "",
+      api_url : link,
+  }, async()=>{
+    let result = await getPosts()
+    this.setState({
+      "Posts" : [...result.data],
+      "queryAfter" : result.queryAfter})
+  })
+
+
+}
+
+//get appropriate POsts
+getPosts = async()=> {
+  let response = await fetch(`${this.state.api_url}`)
+  let result = await response.json()
+  // console.log("New DATA:", result.data.children[0].data.title)
+  return(
+  {
+    "data" : result.data.children,
+    "queryAfter" : result.data.after
   })
 }
 
@@ -119,24 +146,21 @@ loadMorePosts = async()=>{
   //fetching the next batch of posts by adding a query parameter acording to the reddit docs
   let response = await fetch(`${this.state.api_url}?after=${this.state.queryAfter}`)
   let result = await response.json()
-   let data = result.data.children
-  data.map((item)=> {
-    console.log("ITEM:", item)
-  })
+  let data = [...result.data.children]
   let query = result.data.after
-  //let test = this.state.Posts
-
+  let test = [...this.state.Posts]
+  console.log("Post:",typeof(this.state.Posts))
   //update the posts and query parameter
-  // this.setState((previousState)=>({
-  //   Posts : [...previousState, result.data.children],
-  //   queryAfter : query
-  // }))
+  this.setState((previousState)=>({
+    Posts : [...test, ...data],
+    queryAfter : query,
+  }))
 
 }
 
   render()
   {
-    console.log("LENGTH OF POSTS ARRAY:", this.state.Posts.length)
+    //console.log("LENGTH OF POSTS ARRAY:", this.state.Posts.length)
 
     return(
       <SafeAreaView style = {styles.container}>
