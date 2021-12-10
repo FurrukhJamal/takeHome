@@ -5,7 +5,7 @@ import { StatusBar, Platform, StyleSheet, Text, View, FlatList, Image,  SafeArea
 const PostList = (props)=>(
   <View style = {styles.postListContainer}>
     <FlatList
-      contentContainerStyle = {{paddingTop : 20}}
+      contentContainerStyle = {{paddingTop : 20, alignItems : "center"}}
       data = {props.data}
       renderItem = {renderPost}
       keyExtractor = {(item, index)=> index.toString()}/>
@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop : Platform.OS == "android" ? StatusBar.currentHeight: 0,
     alignItems : "center",
+    backgroundColor : "grey"
   },
   postListContainer : {
     width : "100%",
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
     width : "90%",
     backgroundColor : "blue",
     marginBottom : 10,
-    alignItems : "center",
+    //alignItems : "center",
   },
   rowContainer : {
     flexDirection : "row",
