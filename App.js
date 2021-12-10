@@ -1,6 +1,6 @@
 // import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StatusBar, Platform, StyleSheet, Text, View, FlatList, Image,  SafeAreaView, TouchableOpacity} from 'react-native';
+import { Button, StatusBar, Platform, StyleSheet, Text, View, FlatList, Image,  SafeAreaView, TouchableOpacity} from 'react-native';
 import * as WebBrowser from "expo-web-browser";
 
 const PostList = (props)=>(
@@ -9,7 +9,8 @@ const PostList = (props)=>(
       contentContainerStyle = {{paddingTop : 20, alignItems : "center"}}
       data = {props.data}
       renderItem = {(obj)=>renderPost(obj, props.openLink)}
-      keyExtractor = {(item, index)=> index.toString()}/>
+      keyExtractor = {(item, index)=> index.toString()}
+      onEndReached = {props.onEndReached}/>
   </View>
 )
 
@@ -59,17 +60,22 @@ const renderPost = (obj,openInBrowser)=>{
 
 export default class App extends React.Component{
   state = {
-    "Posts" : []
+    "Posts" : [],
+    allPosts : true,
+    topPosts : false,
+    newPosts : false,
+    api_url : "https://api.reddit.com/r/programming/hot.json",
   }
 
   async componentDidMount(){
-    let response = await fetch("https://api.reddit.com/r/programming/hot.json")
+    let response = await fetch(`${this.state.api_url}`)
     let result = await response.json()
     // console.log("New DATA:", result.data.children[0].data.title)
     this.setState({
       Posts : result.data.children,
+      queryAfter : result.data.after,
     }, ()=>{
-      //console.log("Posts are after in state:", this.state.Posts)
+      console.log("QueryFlag: ", this.state.queryAfter)
     })
   }
 
@@ -80,13 +86,86 @@ export default class App extends React.Component{
     await WebBrowser.openBrowserAsync(link);
   }
 
+
+  //logic to display all posts
+  handleAllPostSelection = ()=>{
+    this.setState({
+      allPosts : true,
+      topPosts : false,
+      newPosts : false,
+    })
+  }
+
+  //to handle Top Posts Selection
+  handleTopPostSelection = ()=>{
+    this.setState({
+      allPosts : false,
+      topPosts : true,
+      newPosts : false,
+    })
+  }
+
+  //to handle newest Post Selection
+  hanldeNewPostSelection = ()=> {
+    this.setState({
+      allPosts : false,
+      topPosts : false,
+      newPosts : true,
+      queryAfter : ""
+  })
+}
+
+loadMorePosts = async()=>{
+  //fetching the next batch of posts by adding a query parameter acording to the reddit docs
+  let response = await fetch(`${this.state.api_url}?after=${this.state.queryAfter}`)
+  let result = await response.json()
+   let data = result.data.children
+  data.map((item)=> {
+    console.log("ITEM:", item)
+  })
+  let query = result.data.after
+  //let test = this.state.Posts
+
+  //update the posts and query parameter
+  // this.setState((previousState)=>({
+  //   Posts : [...previousState, result.data.children],
+  //   queryAfter : query
+  // }))
+
+}
+
   render()
   {
+    console.log("LENGTH OF POSTS ARRAY:", this.state.Posts.length)
+
     return(
       <SafeAreaView style = {styles.container}>
+        {/*Panel to select top or new posts*/}
+        <View style = {styles.postSelectionContainer}>
+          <View>
+            <Button
+              title = "All Posts"
+              disabled = {this.state.allPosts ? true : false}
+              onPress = {this.handleAllPostSelection}/>
+          </View>
+          <View>
+            <Button
+              title = "Top Posts"
+              disabled = {this.state.topPosts ? true : false}
+              onPress = {this.handleTopPostSelection}/>
+          </View>
+          <View>
+            <Button
+              title = "Newest Posts"
+              disabled = {this.state.newPosts ? true : false}
+              onPress = {this.hanldeNewPostSelection}/>
+          </View>
+        </View>
+
         <PostList
           data = {this.state.Posts}
-          openLink = {this.handlePostClick}/>
+          openLink = {this.handlePostClick}
+          onEndReached = {this.loadMorePosts}/>
       </SafeAreaView>
     )
   }
@@ -151,5 +230,12 @@ const styles = StyleSheet.create({
     width : "30%",
     backgroundColor : "white",
     alignItems : "center",
+  },
+  postSelectionContainer : {
+    flexDirection : "row",
+    justifyContent : "space-around",
+    marginBottom : 10,
+    width : "100%",
+    marginTop : 10,
   }
 });
