@@ -26,7 +26,7 @@ const renderPost = (obj)=>{
         </View>
         <View style = {styles.infoContainer}>
           <View style = {{alignSelf : "flex-end", backgroundColor : "yellow"}}>
-            <Text>some date</Text>
+            <Text style = {{padding : 10}}>some date</Text>
           </View>
           <View style = {styles.titleContainer}>
             <Text style = {{fontSize : 32}}>Some Big Title</Text>
@@ -72,7 +72,8 @@ export default class App extends React.Component{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop : Platform.OS == "android" ? StatusBar.currentHeight: 0
+    paddingTop : Platform.OS == "android" ? StatusBar.currentHeight: 0,
+    alignItems : "center",
   },
   postListContainer : {
     width : "100%",
