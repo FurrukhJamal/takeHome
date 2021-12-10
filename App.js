@@ -7,21 +7,23 @@ const PostList = (props)=>(
     <FlatList
       contentContainerStyle = {{paddingTop : 20, alignItems : "center"}}
       data = {props.data}
-      renderItem = {renderPost}
+      renderItem = {(obj)=>renderPost(obj, props.openLink)}
       keyExtractor = {(item, index)=> index.toString()}/>
   </View>
 )
 
 
-const renderPost = (obj)=>{
+const renderPost = (obj,openInBrowser)=>{
   //console.log("Object in renderPost", obj)
   //convert the time stamp to a date
-  let timeStamp = new Date(obj.item.data.created)
-  console.log("TimeStamp Creation :", obj.item.data.created_utc)
+  let timeStamp = new Date(obj.item.data.created * 1000)
+  //console.log("TimeStamp Creation :", obj.item.data.created_utc)
   let date = timeStamp.toDateString()
-  console.log("DATE :", timeStamp)
+  //console.log("DATE :", timeStamp)
   return (
-    <TouchableOpacity style = {styles.postContainer}>
+    <TouchableOpacity
+      style = {styles.postContainer}
+      onPress = {()=>openInBrowser(obj.item.data.permalink)}>
       <View style = {styles.rowContainer}>
         <View style = {styles.thumbnailContainer}>
           <Image
@@ -43,7 +45,9 @@ const renderPost = (obj)=>{
             <View>
               <Text>{obj.item.data.score}</Text>
             </View>
-            <View><Text>coments</Text></View>
+            <View style = {styles.commentsContainer}>
+              <Text>{obj.item.data.num_comments} coments</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -68,11 +72,18 @@ export default class App extends React.Component{
     })
   }
 
+  //to open each post in device's browser
+  handlePostClick = (url)=> {
+    console.log("Link to open:", url)
+  }
+
   render()
   {
     return(
       <SafeAreaView style = {styles.container}>
-        <PostList data = {this.state.Posts}/>
+        <PostList
+          data = {this.state.Posts}
+          openLink = {this.handlePostClick}/>
       </SafeAreaView>
     )
   }
@@ -132,5 +143,10 @@ const styles = StyleSheet.create({
     backgroundColor : "teal",
     alignItems : "center",
 
+  },
+  commentsContainer : {
+    width : "30%",
+    backgroundColor : "white",
+    alignItems : "center",
   }
 });
