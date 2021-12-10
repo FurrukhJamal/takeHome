@@ -93,20 +93,39 @@ export default class App extends React.Component{
 
   //logic to display all posts
   handleAllPostSelection = ()=>{
+    let link = "https://api.reddit.com/r/programming/hot.json"
     this.setState({
       allPosts : true,
       topPosts : false,
       newPosts : false,
+      queryAfter : "",
+      api_url : link,
+    },
+    async()=>{
+      let result = await this.getPosts()
+      this.setState({
+        "Posts" : [...result.data],
+        "queryAfter" : result.queryAfter})
     })
   }
 
   //to handle Top Posts Selection
   handleTopPostSelection = ()=>{
+    let link = "https://api.reddit.com/r/programming/top.json"
     this.setState({
       allPosts : false,
       topPosts : true,
       newPosts : false,
-    })
+      queryAfter : "",
+      api_url : link,
+    },
+    async()=>{
+      let result = await this.getPosts()
+      this.setState({
+        "Posts" : [...result.data],
+        "queryAfter" : result.queryAfter})
+    }
+    )
 
 
   }
@@ -121,7 +140,7 @@ export default class App extends React.Component{
       queryAfter : "",
       api_url : link,
   }, async()=>{
-    let result = await getPosts()
+    let result = await this.getPosts()
     this.setState({
       "Posts" : [...result.data],
       "queryAfter" : result.queryAfter})
