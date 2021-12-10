@@ -1,13 +1,13 @@
 // import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { Button, StatusBar, Platform, StyleSheet, Text, View, FlatList, Image,  SafeAreaView, TouchableOpacity} from 'react-native';
+import { TextInput, Button, StatusBar, Platform, StyleSheet, Text, View, FlatList, Image,  SafeAreaView, TouchableOpacity} from 'react-native';
 import * as WebBrowser from "expo-web-browser";
-
+import Autocomplete from 'react-native-autocomplete-input';
 
 const PostList = (props)=>(
   <View style = {styles.postListContainer}>
     <FlatList
-      contentContainerStyle = {{paddingTop : 20, alignItems : "center"}}
+      contentContainerStyle = {{ paddingTop : 20, alignItems : "center"}}
       data = {props.data}
       renderItem = {(obj)=>renderPost(obj, props.openLink)}
       keyExtractor = {(item, index)=> index.toString()}
@@ -68,7 +68,9 @@ export default class App extends React.Component{
     topPosts : false,
     newPosts : false,
     api_url : "https://api.reddit.com/r/programming/hot.json",
-
+    searchedValue : "",
+    searchedData : [],
+    flagToDisplayAutoComplete : true
   }
 
   async componentDidMount(){
@@ -177,12 +179,62 @@ loadMorePosts = async()=>{
 
 }
 
+handleInputChange = (text)=>{
+  console.log("Text Typed", text)
+  this.setState({searchedValue : text})
+}
+
+
+handleSearchSubmit = (event)=> {
+  event.persist()
+  console.log("Key pressed", event.nativeEvent.text.length)
+  //add the searched item in the history
+  if(event.nativeEvent.text.length != 0)
+  {
+    //bug fix to stop adding empty space if submit was pressed with anything typed
+    this.setState((previousState)=> {
+      console.log("previousState:", previousState.searchedData)
+      return({
+        searchedData : [...previousState.searchedData, event.nativeEvent.text],
+        searchedValue : "",
+      })
+    })
+  }
+
+}
+
+
+displayAutoCompList = ()=>{
+  this.setState({
+    flagToDisplayAutoComplete : false
+  })
+}
+
   render()
   {
     //console.log("LENGTH OF POSTS ARRAY:", this.state.Posts.length)
 
     return(
       <SafeAreaView style = {styles.container}>
+        {/*Autocoomplete textinput*/}
+        <View style = {styles.inputContainer}>
+          <Autocomplete
+            containerStyle = {{width : "90%", paddingBottom : 20}}
+            data={this.state.searchedData}
+            value={this.state.searchedValue}
+            onChangeText={this.handleInputChange}
+            onSubmitEditing = {this.handleSearchSubmit}
+            onFocus = {this.displayAutoCompList}
+            onBlur = {()=>this.setState({flagToDisplayAutoComplete : true})}
+            hideResults = {this.state.flagToDisplayAutoComplete}
+            placeholder = "Search"
+            flatListProps={{
+              keyExtractor: (_, idx) => idx.toString(),
+              renderItem: ({ item }) => <Text>{item}</Text>,
+            }}/>
+        </View>
+
+
         {/*Panel to select top or new posts*/}
         <View style = {styles.postSelectionContainer}>
           <View>
@@ -204,6 +256,10 @@ loadMorePosts = async()=>{
               onPress = {this.hanldeNewPostSelection}/>
           </View>
         </View>
+
+
+
+
 
         <PostList
           data = {this.state.Posts}
@@ -279,6 +335,20 @@ const styles = StyleSheet.create({
     justifyContent : "space-around",
     marginBottom : 10,
     width : "100%",
-    marginTop : 10,
+    marginTop : 69,
+  },
+  inputContainer : {
+    marginBottom : 20,
+    width : "80%",
+    //backgroundColor : "yellow",
+    //alignItems : "center",
+    flex: 1,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: StatusBar.currentHeight,
+    zIndex: 1,
+    left : 40,
+
   }
 });
