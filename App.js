@@ -15,6 +15,11 @@ const PostList = (props)=>(
 
 const renderPost = (obj)=>{
   //console.log("Object in renderPost", obj)
+  //convert the time stamp to a date
+  let timeStamp = new Date(obj.item.data.created)
+  console.log("TimeStamp Creation :", obj.item.data.created_utc)
+  let date = timeStamp.toDateString()
+  console.log("DATE :", timeStamp)
   return (
     <TouchableOpacity style = {styles.postContainer}>
       <View style = {styles.rowContainer}>
@@ -26,14 +31,18 @@ const renderPost = (obj)=>{
         </View>
         <View style = {styles.infoContainer}>
           <View style = {{alignSelf : "flex-end", backgroundColor : "yellow"}}>
-            <Text style = {{padding : 10}}>some date</Text>
+            <Text style = {{padding : 10}}>{date}</Text>
           </View>
           <View style = {styles.titleContainer}>
-            <Text style = {{fontSize : 32}}>Some Big Title</Text>
+            <Text style = {{fontSize : 22, fontWeight : "bold"}}>{obj.item.data.title}</Text>
           </View>
           <View style = {styles.authorScoreRow}>
-            <View><Text>author</Text></View>
-            <View><Text>sxore</Text></View>
+            <View style = {styles.authorContainer}>
+              <Text style = {{flex : 1}} numberOfLines = {1}>{obj.item.data.author}</Text>
+            </View>
+            <View>
+              <Text>{obj.item.data.score}</Text>
+            </View>
             <View><Text>coments</Text></View>
           </View>
         </View>
@@ -90,10 +99,14 @@ const styles = StyleSheet.create({
     flexDirection : "row",
     width : "100%",
     padding : 15,
+    alignItems : "center"
   },
   thumbnailContainer: {
     width: 100,
     height : 100,
+    backgroundColor : "white",
+    alignItems : "center",
+    marginRight : 10,
 
   },
   infoContainer : {
@@ -113,5 +126,11 @@ const styles = StyleSheet.create({
     backgroundColor : "red",
     justifyContent : "space-around",
     padding : 10,
+  },
+  authorContainer : {
+    width : "50%",
+    backgroundColor : "teal",
+    alignItems : "center",
+
   }
 });
