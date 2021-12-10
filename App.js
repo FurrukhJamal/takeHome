@@ -1,6 +1,7 @@
 // import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StatusBar, Platform, StyleSheet, Text, View, FlatList, Image,  SafeAreaView, TouchableOpacity} from 'react-native';
+import * as WebBrowser from "expo-web-browser";
 
 const PostList = (props)=>(
   <View style = {styles.postListContainer}>
@@ -73,8 +74,10 @@ export default class App extends React.Component{
   }
 
   //to open each post in device's browser
-  handlePostClick = (url)=> {
+  handlePostClick = async(url)=> {
     console.log("Link to open:", url)
+    let link = "https://www.reddit.com" + url
+    await WebBrowser.openBrowserAsync(link);
   }
 
   render()
