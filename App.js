@@ -31,10 +31,21 @@ const renderPost = (obj,openInBrowser)=>{
       onPress = {()=>openInBrowser(obj.item.data.permalink)}>
       <View style = {styles.rowContainer}>
         <View style = {styles.thumbnailContainer}>
-          <Image
-            source = {require("./assets/noimage.png")}
-            style = {{width : "90%", height : "90%"}}
-            resizeMode = "contain"/>
+          {
+            obj.item.data.thumbnail ? (
+              <Image
+                source = {{uri : obj.item.data.thumbnail}}
+                style = {{width : "90%", height : "90%"}}
+                resizeMode = "contain"/>
+            ) : (
+              <Image
+                source = {require("./assets/noimage.png")}
+                style = {{width : "90%", height : "90%"}}
+                resizeMode = "contain"/>
+            )
+
+          }
+
         </View>
         <View style = {styles.infoContainer}>
           <View style = {{alignSelf : "flex-end", backgroundColor : "yellow"}}>
@@ -47,7 +58,7 @@ const renderPost = (obj,openInBrowser)=>{
             <View style = {styles.authorContainer}>
               <Text style = {{flex : 1}} numberOfLines = {1}>{obj.item.data.author}</Text>
             </View>
-            <View>
+            <View style ={styles.scoreContainer}>
               <Text>{obj.item.data.score}</Text>
             </View>
             <View style = {styles.commentsContainer}>
@@ -275,7 +286,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop : Platform.OS == "android" ? StatusBar.currentHeight: 0,
     alignItems : "center",
-    backgroundColor : "grey"
+    backgroundColor : "gray"
   },
   postListContainer : {
     width : "100%",
@@ -283,9 +294,12 @@ const styles = StyleSheet.create({
   },
   postContainer : {
     width : "90%",
-    backgroundColor : "blue",
+    //backgroundColor : "blue",
     marginBottom : 10,
-    //alignItems : "center",
+    // borderBottomWidth : 2,
+    // borderBottomColor : "white",
+    borderTopWidth : 2,
+    borderTopColor : "white",
   },
   rowContainer : {
     flexDirection : "row",
@@ -296,39 +310,50 @@ const styles = StyleSheet.create({
   thumbnailContainer: {
     width: 100,
     height : 100,
-    backgroundColor : "white",
+    //backgroundColor : "white",
     alignItems : "center",
     marginRight : 10,
 
   },
   infoContainer : {
-    backgroundColor : "green",
-    width : "75%",
+    //backgroundColor : "green",
+    width : "80%",
     padding : 10,
   },
   titleContainer : {
     width : "100%",
-    backgroundColor : "pink",
+    //backgroundColor : "pink",
     padding : 10,
 
   },
   authorScoreRow : {
     width : "100%",
     flexDirection : "row",
-    backgroundColor : "red",
-    justifyContent : "space-around",
+    //backgroundColor : "red",
+    justifyContent : "space-between",
     padding : 10,
   },
   authorContainer : {
     width : "50%",
-    backgroundColor : "teal",
+    //backgroundColor : "teal",
     alignItems : "center",
-
+    borderWidth: 1,
+    borderColor : "white",
+    justifyContent : "center",
+  },
+  scoreContainer : {
+    borderWidth: 1,
+    borderColor : "white",
+    justifyContent : "center",
+    width : "18%",
+    alignItems : "center",
   },
   commentsContainer : {
     width : "30%",
-    backgroundColor : "white",
+    //backgroundColor : "white",
     alignItems : "center",
+    borderWidth: 1,
+    borderColor : "white"
   },
   postSelectionContainer : {
     flexDirection : "row",
