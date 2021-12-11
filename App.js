@@ -1,9 +1,20 @@
 // import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { TextInput, Button, StatusBar, Platform, StyleSheet, Text, View, FlatList, Image,  SafeAreaView, TouchableOpacity} from 'react-native';
+import {Pressable,TextInput, Button, StatusBar, Platform, StyleSheet, Text, View, FlatList, Image,  SafeAreaView, TouchableOpacity} from 'react-native';
 import * as WebBrowser from "expo-web-browser";
 import Autocomplete from 'react-native-autocomplete-input';
 import PostList from "./postlist";
+
+ // <TouchableOpacity style = {{backgroundColor : "red"}} onPress = {()=>{
+ //     console.log("searched item clicked")
+ //       this.setState({searchedValue : item})
+ //   }}>
+ //   <Text>{item}</Text>
+ //   <Text>test</Text>
+ // </TouchableOpacity>
+
+
+
 
 
 export default class App extends React.Component{
@@ -155,10 +166,19 @@ displayAutoCompList = ()=>{
   })
 }
 
+test = (item)=>{
+  console.log("Inside Test Funxtion, itm,", item)
+  return (
+  <TouchableOpacity style = {{borderWidth : 2, borderColor : "white", padding : 20,backgroundColor : "red"}}
+    onPress = {()=>console.log("Pressed")}>
+    <View><Text>{item}</Text></View>
+  </TouchableOpacity>
+)}
+
   render()
   {
     //console.log("LENGTH OF POSTS ARRAY:", this.state.Posts.length)
-
+    //const data = filterData(this.state.searchedValue)
     return(
       <SafeAreaView style = {styles.container}>
         {/*Autocoomplete textinput*/}
@@ -175,8 +195,9 @@ displayAutoCompList = ()=>{
             placeholder = "Search"
             flatListProps={{
               keyExtractor: (_, idx) => idx.toString(),
-              renderItem: ({ item }) => <Text>{item}</Text>,
+              renderItem: ({ item }) =>this.test(item),
             }}/>
+
         </View>
 
 
