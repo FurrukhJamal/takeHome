@@ -38,10 +38,14 @@ const renderPost = (obj,openInBrowser)=>{
                 style = {{width : "90%", height : "90%"}}
                 resizeMode = "contain"/>
             ) : (
+              <View style = {{width:"100%", height : "100%", alignItems : "center"}}>
               <Image
                 source = {require("./assets/noimage.png")}
                 style = {{width : "90%", height : "90%"}}
                 resizeMode = "contain"/>
+
+              <Text style = {{color : "red"}}>No image available</Text>
+              </View>
             )
 
           }
