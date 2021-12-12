@@ -142,10 +142,11 @@ handleInputChange = (text)=>{
 
 
 handleSearchSubmit = (event)=> {
+  //bug fix to have access to event
   event.persist()
   //console.log("Key pressed", event.nativeEvent.text.length)
-  //add the searched item in the history
-  if(event.nativeEvent.text.length != 0)
+  //add the searched item in the history if not already there
+  if(event.nativeEvent.text.length != 0 && !this.state.searchedData.includes(event.nativeEvent.text))
   {
     //bug fix to stop adding empty space if submit was pressed with anything typed
     this.setState((previousState)=> {
@@ -159,18 +160,22 @@ handleSearchSubmit = (event)=> {
 
 }
 
-
+//deals with the flag to display autocomplete list only when input in focus
 displayAutoCompList = ()=>{
   this.setState({
     flagToDisplayAutoComplete : false
   })
 }
 
-test = (item)=>{
-  console.log("Inside Test Funxtion, itm,", item)
+//component to display the autocomplete list and make selection
+displayAutoComplete = (item)=>{
+  //console.log("Inside Test Funxtion, itm,", item)
   return (
-  <TouchableOpacity style = {{borderWidth : 2, borderColor : "white", padding : 20,backgroundColor : "red"}}
-    onPress = {()=>console.log("Pressed")}>
+  <TouchableOpacity style = {{padding : 10,}}
+    onPress = {()=>{
+      //console.log("Pressed")
+      this.setState({searchedValue : item})
+    }}>
     <View><Text>{item}</Text></View>
   </TouchableOpacity>
 )}
@@ -184,6 +189,7 @@ test = (item)=>{
         {/*Autocoomplete textinput*/}
         <View style = {styles.inputContainer}>
           <Autocomplete
+            listContainerStyle={{ zIndex : 1}}
             containerStyle = {{width : "90%", paddingBottom : 20}}
             data={this.state.searchedData}
             value={this.state.searchedValue}
@@ -195,27 +201,29 @@ test = (item)=>{
             placeholder = "Search"
             flatListProps={{
               keyExtractor: (_, idx) => idx.toString(),
-              renderItem: ({ item }) =>this.test(item),
-            }}/>
+              renderItem: ({ item }) =>this.displayAutoComplete(item),
+              keyboardShouldPersistTaps : 'always',
+            }}
+            />
 
         </View>
 
 
         {/*Panel to select top or new posts*/}
         <View style = {styles.postSelectionContainer}>
-          <View>
+          <View style = {{zIndex : 0}}>
             <Button
               title = "All Posts"
               disabled = {this.state.allPosts ? true : false}
               onPress = {this.handleAllPostSelection}/>
           </View>
-          <View>
+          <View style = {{zIndex : 0}}>
             <Button
               title = "Top Posts"
               disabled = {this.state.topPosts ? true : false}
               onPress = {this.handleTopPostSelection}/>
           </View>
-          <View>
+          <View style = {{zIndex : 0}}>
             <Button
               title = "Newest Posts"
               disabled = {this.state.newPosts ? true : false}
